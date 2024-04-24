@@ -2,6 +2,7 @@
     dump
 -------------------------------------------------------------------------------*/
 use std::env;
+use std::time::Instant;
 
 use mysql::*;
 use mysql::prelude::*;
@@ -13,6 +14,8 @@ use chrono::format::strftime::StrftimeItems;
 
 
 fn main() {
+    let start_time = Instant::now();    // プログラムの開始時刻を記録
+
     let version = "0.1.0";
 
     // 引数の処理
@@ -87,6 +90,15 @@ fn main() {
         println!("UNLOCK TABLES;\n");
     }
 
+    // プログラムの終了時刻を記録
+    let end_time = Instant::now();
+
+    // 実行時間を計算
+    let execution_time = end_time.duration_since(start_time);
+
+    //
+    println!("-- elapsed {:?}.\n", execution_time);
+
 }
 
 
@@ -160,9 +172,9 @@ fn lock_tables(conn: &mut mysql::PooledConn, tables: &Vec<Row>, column: &str) {
         let table_name = table_name.as_str();
         table_lock_query.push_str(table_name);
     }
-    table_lock_query.push(';');
     table_lock_query.remove(0);
-    table_lock_query.insert_str(0, "LOCK TABLES ");
+
+    table_lock_query = format!("LOCK TABLES {};", table_lock_query);
     conn.query_drop(&table_lock_query).unwrap();     // tables lock!
 }
 
@@ -210,6 +222,7 @@ fn print_dump_header(conn: &mut mysql::PooledConn, db_name: &str, version: &str)
     println!("CREATE DATABASE `{}`;", db_name);
     println!("USE `{}`;\n", db_name);
 }
+
 
 /*
     export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH

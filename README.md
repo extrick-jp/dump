@@ -5,4 +5,5 @@ Webサーバーとデータベースサーバーが別々になっていて、We
 dump -u DB_USER [-p DB_PASS] [-h DB_HOST] DB_NAME
 
 DB_HOST: 省略すると localhost が指定されます。
+
 DB_PASS: パスワードなしで開ける場合は省略してください。
